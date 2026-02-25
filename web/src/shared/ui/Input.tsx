@@ -18,7 +18,7 @@ export function Input({ label, error, ...props }: InputDto) {
     <div className="flex w-full flex-col gap-1">
       {label && (
         <label
-          htmlFor={id}
+          htmlFor={props?.id ?? id}
           className="text-base-content/70 text-sm font-medium"
         >
           {label}
@@ -27,7 +27,7 @@ export function Input({ label, error, ...props }: InputDto) {
       <div className="input w-full rounded-full">
         <input
           {...props}
-          id={id}
+          id={props?.id ?? id}
           className={props.className}
           type={isVisiblePassword ? "text" : props.type}
         />
