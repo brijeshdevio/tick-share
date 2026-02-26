@@ -1,7 +1,7 @@
 import { CloudUpload } from "lucide-react";
 export function Footer() {
   return (
-    <footer className="border-t border-gray-200 bg-white px-4 py-8 text-sm text-gray-600">
+    <footer className="bg-base-100/70 border-t border-white/10 px-4 py-8 text-sm text-gray-600">
       <div className="mx-auto max-w-md space-y-6 text-center">
         {/* Logo and Name */}
         <div className="flex flex-col items-center justify-center gap-2">
