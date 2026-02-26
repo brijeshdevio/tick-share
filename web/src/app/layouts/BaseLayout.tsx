@@ -6,7 +6,7 @@ export function BaseLayout() {
   return (
     <>
       <Navbar />
-      <main className="pt-5">
+      <main>
         <Outlet />
       </main>
       <Footer />
