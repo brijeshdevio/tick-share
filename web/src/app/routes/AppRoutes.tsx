@@ -5,6 +5,7 @@ import { BaseLayout } from "@/app/layouts/BaseLayout";
 const Home = lazy(() => import("@/features/home/Home"));
 const Register = lazy(() => import("@/features/auth/pages/Register"));
 const Login = lazy(() => import("@/features/auth/pages/Login"));
+const Dashboard = lazy(() => import("@/features/dashboard/Dashboard"));
 
 export function AppRoutes() {
   return (
@@ -13,6 +14,7 @@ export function AppRoutes() {
         <Routes>
           <Route element={<BaseLayout />}>
             <Route path="/" element={<Home />} />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Route>
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
