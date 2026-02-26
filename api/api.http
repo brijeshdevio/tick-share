@@ -1,0 +1,7 @@
+@BASE_URL = http://localhost:3000
+
+### Health check
+GET {{BASE_URL}}/health
+
+### Get greet
+GET {{BASE_URL}}/
