@@ -5,3 +5,25 @@ GET {{BASE_URL}}/health
 
 ### Get greet
 GET {{BASE_URL}}/
+
+### Register user
+POST {{BASE_URL}}/auth/register
+Content-Type: application/json
+
+{
+    "name": "Jonson",
+    "email": "jonson@ex.com",
+    "password": "123456"
+}
+
+### Login user
+POST {{BASE_URL}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "jonson@ex.com",
+    "password": "123456"
+}
+
+### Logout user
+POST {{BASE_URL}}/auth/logout
