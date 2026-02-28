@@ -1,25 +1,40 @@
 import { BadRequestException } from '@nestjs/common';
+import { fileTypeFromBuffer } from 'file-type';
 import { envConfig } from '../config';
 import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../constants';
 
 export const getUrl = (imgId: string): string => {
-  return `${envConfig.APP_URL}/images/${imgId}`;
+  return `${envConfig.APP_URL}/files/${imgId}`;
 };
 
-export const fileValidation = (file: Express.Multer.File): void => {
+export const fileValidation = async (
+  file: Express.Multer.File,
+): Promise<void> => {
   if (!file) {
-    throw new BadRequestException('File is required. Please upload a file.');
+    throw new BadRequestException('File is required.');
   }
 
-  if (!ALLOWED_MIME_TYPES.includes(file?.mimetype)) {
-    throw new BadRequestException(
-      'Only image files are allowed. PNG, JPEG, JPG, and GIF are supported.',
-    );
-  }
-
-  if (file?.size > MAX_FILE_SIZE) {
+  if (file.size > MAX_FILE_SIZE) {
     throw new BadRequestException(
       `File size exceeds ${MAX_FILE_SIZE / 1024 / 1024}MB.`,
     );
   }
+
+  await validateFileSignature(file.buffer);
+
+  const allAllowedTypes = Object.values(ALLOWED_MIME_TYPES).flat();
+
+  if (!allAllowedTypes.includes(file.mimetype)) {
+    throw new BadRequestException(`Unsupported file type: ${file.mimetype}`);
+  }
+};
+
+export const validateFileSignature = async (buffer: Buffer) => {
+  const type = await fileTypeFromBuffer(buffer);
+
+  if (!type) {
+    throw new BadRequestException('Invalid file signature.');
+  }
+
+  return type.mime;
 };

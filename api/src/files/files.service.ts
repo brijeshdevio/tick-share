@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
 import { randomString } from '../lib';
@@ -52,5 +52,21 @@ export class FilesService {
       },
     });
     return { files };
+  }
+
+  async previewPublic(hashKey: string) {
+    const file = await this.prismaService.file.findFirst({
+      where: { hashKey, visibility: 'PUBLIC', expiresAt: { gt: new Date() } },
+      select: { storageId: true, mimeType: true, name: true },
+    });
+    if (!file) {
+      throw new ForbiddenException('File not found.');
+    }
+    const data = await this.storageService.preview(file.storageId);
+    return {
+      data,
+      mimeType: file.mimeType,
+      name: file.name,
+    };
   }
 }

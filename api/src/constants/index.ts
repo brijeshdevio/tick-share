@@ -22,13 +22,22 @@ export const MESSAGES = {
   FILE_UPLOAD_SUCCESS: 'File uploaded successfully.',
 };
 
-export const ALLOWED_MIME_TYPES = [
-  'image/jpg',
-  'image/jpeg',
-  'image/png',
-  'image/webp',
-  'image/gif',
-  'image/svg',
-  'image/avif',
-];
-export const MAX_FILE_SIZE = 5 * 1024 * 1024;
+export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+export const ALLOWED_MIME_TYPES = {
+  image: [
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+    'image/gif',
+    'image/svg+xml',
+  ],
+  video: ['video/mp4', 'video/webm', 'video/ogg'],
+  audio: ['audio/mpeg', 'audio/wav', 'audio/ogg'],
+  document: [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/zip',
+  ],
+};
