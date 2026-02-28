@@ -18,4 +18,17 @@ export const MESSAGES = {
   USER_CREATION_SUCCESS: 'User created successfully.',
   USER_LOGIN_SUCCESS: 'User logged in successfully.',
   USER_LOGOUT_SUCCESS: 'User logged out successfully.',
+  UNAUTHORIZED: 'You are not logged in. Please login to continue.',
+  FILE_UPLOAD_SUCCESS: 'File uploaded successfully.',
 };
+
+export const ALLOWED_MIME_TYPES = [
+  'image/jpg',
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/svg',
+  'image/avif',
+];
+export const MAX_FILE_SIZE = 5 * 1024 * 1024;

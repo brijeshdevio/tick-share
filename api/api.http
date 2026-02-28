@@ -27,3 +27,6 @@ Content-Type: application/json
 
 ### Logout user
 POST {{BASE_URL}}/auth/logout
+
+### Get logged in user profile
+GET {{BASE_URL}}/users/me
