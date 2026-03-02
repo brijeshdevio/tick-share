@@ -1,22 +1,17 @@
-import "dotenv/config";
-// Use "type: module" in package.json to use ES modules
-import express, { Request, Response } from "express";
-const app = express();
+import { env } from "@/config";
+import { app } from "@/app";
 
-// Define your routes
-app.get("/", (_: Request, res: Response) => {
-    res.json({ message: "Hello from Express on Vercel!" });
-});
+const PORT = env.PORT;
 
-app.get("/health", (_: Request, res: Response) => {
-    res.json({ status: "OK" });
-})
-
-const PORT = process.env.PORT ?? 3000
-if (process.env.NODE_ENV === "development") {
-    app.listen(PORT, () => {
-        console.log(`Example app listening on port ${PORT}`);
-    });
+function bootstrap() {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 }
-// Export the Express app
+
+const isDev = env.NODE_ENV === "development";
+if (isDev) {
+  bootstrap();
+}
+
 export default app;

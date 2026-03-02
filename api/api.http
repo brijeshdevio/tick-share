@@ -1,0 +1,50 @@
+@BASE_URL = http://localhost:4000/api
+
+### Health check
+GET {{BASE_URL}}/health
+
+### Get greeting
+GET {{BASE_URL}}/
+
+### Register user
+POST {{BASE_URL}}/auth/register
+Content-Type: application/json
+
+{
+    "name": "Jonson",
+    "email": "jonson@ex.com",
+    "password": "123456"
+}
+
+### Login user
+POST {{BASE_URL}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "jonson@ex.com",
+    "password": "123456"
+}
+
+### Logout user
+POST {{BASE_URL}}/auth/logout
+
+### Get logged-in user profile
+GET {{BASE_URL}}/users/me
+
+### Get authenticated user's files metadata
+GET {{BASE_URL}}/files
+
+### Upload file (authenticated user)
+POST {{BASE_URL}}/files/upload
+
+### Get file metadata by ID
+GET {{BASE_URL}}/files/B-2od4JPa85JR/metadata
+
+### Preview file by ID
+GET {{BASE_URL}}/files/B-2od4JPa85JRF/preview
+
+### Download file by ID
+GET {{BASE_URL}}/files/B-2od4JPa85JRF/download
+
+### Get file by ID 
+DELETE {{BASE_URL}}/files/B-2od4JPa85JRF
