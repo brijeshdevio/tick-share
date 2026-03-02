@@ -8,6 +8,10 @@ app.get("/", (_: Request, res: Response) => {
     res.json({ message: "Hello from Express on Vercel!" });
 });
 
+app.get("/health", (_: Request, res: Response) => {
+    res.json({ status: "OK" });
+})
+
 const PORT = process.env.PORT ?? 3000
 if (process.env.NODE_ENV === "development") {
     app.listen(PORT, () => {
