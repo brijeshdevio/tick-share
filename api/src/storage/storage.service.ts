@@ -20,11 +20,17 @@ export class StorageService {
   }
 
   async getPreview(storageKey: string): Promise<ArrayBuffer> {
-    return storage.getFilePreview(envConfig.APPWRITE_BUCKET_ID, storageKey);
+    return await storage.getFileDownload(
+      envConfig.APPWRITE_BUCKET_ID,
+      storageKey,
+    );
   }
 
   async getDownload(storageKey: string): Promise<ArrayBuffer> {
-    return storage.getFileDownload(envConfig.APPWRITE_BUCKET_ID, storageKey);
+    return await storage.getFileDownload(
+      envConfig.APPWRITE_BUCKET_ID,
+      storageKey,
+    );
   }
 
   async deleteFile(storageKey: string): Promise<void> {

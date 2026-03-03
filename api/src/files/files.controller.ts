@@ -35,7 +35,7 @@ export class FilesController {
   // 1️⃣ Upload
   // ==============================
   @Post('upload')
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async upload(
     @UploadedFile() file: Express.Multer.File,
