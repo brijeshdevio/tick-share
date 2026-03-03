@@ -1,72 +1,184 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { StorageService } from '../storage/storage.service';
-import { randomString } from '../lib';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { nanoid } from 'nanoid';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { StorageService } from 'src/storage/storage.service';
 import { UploadFileDto } from './files.types';
+import { ensureAccessible } from './files.lib';
 
 @Injectable()
 export class FilesService {
   constructor(
-    private readonly prismaService: PrismaService,
-    private readonly storageService: StorageService,
-  ) {}
+    private readonly prisma: PrismaService,
+    private readonly storage: StorageService,
+  ) { }
 
-  async upload(userId: string, body: UploadFileDto, file: Express.Multer.File) {
-    const hashKey = randomString(6);
-    const { $id, sizeOriginal, name, mimeType } =
-      await this.storageService.upload(file);
-    body.name = body.name ?? name;
-    await this.prismaService.file.create({
+  // 1️⃣ Upload File
+  async uploadFile(
+    ownerId: string,
+    file: Express.Multer.File,
+    dto: UploadFileDto,
+  ) {
+    const publicId = nanoid(14);
+
+    const { storageKey } = await this.storage.uploadFile(file);
+
+    return this.prisma.file.create({
       data: {
-        userId,
-        name: body.name ?? name,
-        description: body.description,
-        visibility: body.visibility,
-        expiresAt: body.expiresAt,
-        size: sizeOriginal,
-        hashKey,
-        storageId: $id,
-        mimeType: mimeType,
+        publicId,
+        ownerId,
+        originalName: file.originalname,
+        storageKey,
+        mimeType: file.mimetype,
+        size: file.size,
+        visibility: dto.visibility,
+        expiresAt: dto.expiresAt,
+        maxDownloads: dto.maxDownloads,
+      },
+      select: {
+        publicId: true,
+        originalName: true,
+        mimeType: true,
+        size: true,
+        maxDownloads: true,
+        visibility: true,
       },
     });
-    return {
-      id: hashKey,
-      name: body,
-      size: sizeOriginal,
-      mimeType,
-      visibility: body.visibility,
-      expiresAt: body.expiresAt,
-    };
   }
 
-  async findAll(userId: string) {
-    const files = await this.prismaService.file.findMany({
-      where: { userId },
+  // 2️⃣ Cursor Pagination
+  async getFiles(ownerId: string, cursor?: string, limit = 20) {
+    const files = await this.prisma.file.findMany({
+      take: limit + 1,
+      cursor: cursor ? { id: cursor } : undefined,
+      orderBy: { createdAt: 'desc' },
+      where: {
+        ownerId,
+        expiresAt: { gt: new Date() },
+      },
       select: {
         id: true,
-        name: true,
+        originalName: true,
+        mimeType: true,
         size: true,
-        expiresAt: true,
+        maxDownloads: true,
         visibility: true,
-        hashKey: true,
+        expiresAt: true,
+        createdAt: true,
+        publicId: true,
       },
     });
-    return { files };
+
+    let nextCursor: string | null = null;
+
+    if (files.length > limit) {
+      const next = files.pop();
+      nextCursor = next!.id;
+    }
+
+    return { files, nextCursor };
   }
 
-  async previewPublic(hashKey: string) {
-    const file = await this.prismaService.file.findFirst({
-      where: { hashKey, visibility: 'PUBLIC', expiresAt: { gt: new Date() } },
-      select: { storageId: true, mimeType: true, name: true },
+  // 3️⃣ Get Metadata
+  async getMetadata(publicId: string, userId?: string) {
+    const file = await this.prisma.file.findUnique({
+      where: { publicId },
+      select: {
+        id: true,
+        originalName: true,
+        mimeType: true,
+        size: true,
+        maxDownloads: true,
+        visibility: true,
+        expiresAt: true,
+        createdAt: true,
+        publicId: true,
+        downloadCount: true,
+        owner: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
     });
-    if (!file) {
-      throw new ForbiddenException('File not found.');
-    }
-    const data = await this.storageService.preview(file.storageId);
+    if (!file) throw new NotFoundException(`File not found.`);
+    ensureAccessible(file, userId);
+    return file;
+  }
+
+  // 4️⃣ Preview
+  async preview(publicId: string, ownerId?: string) {
+    const file = await this.prisma.file.findUnique({
+      where: { publicId, ownerId },
+    });
+    if (!file) throw new NotFoundException(`File not found.`);
+    ensureAccessible(file, ownerId);
+    const data = this.storage.getPreview(file.storageKey);
     return {
       data,
       mimeType: file.mimeType,
-      name: file.name,
+      name: file.originalName,
     };
+  }
+
+  // 5️⃣ Download + Increase Count (Transactional)
+  async download(publicId: string, userId?: string) {
+    return this.prisma.$transaction(async (tx) => {
+      const file = await tx.file.findUnique({
+        where: { publicId },
+      });
+
+      if (!file) throw new NotFoundException();
+
+      ensureAccessible(file, userId);
+
+      // Atomic update (prevents race condition)
+      const updated = await tx.file.updateMany({
+        where: {
+          id: file.id,
+          ...(file.maxDownloads && {
+            downloadCount: { lt: file.maxDownloads },
+          }),
+        },
+        data: {
+          downloadCount: { increment: 1 },
+        },
+      });
+
+      if (updated.count === 0) {
+        throw new ForbiddenException('Download limit reached');
+      }
+
+      const data = this.storage.getDownload(file.storageKey);
+      return {
+        data,
+        mimeType: file.mimeType,
+        name: file.originalName,
+      };
+    });
+  }
+
+  // 6️⃣ Soft Delete
+  async softDelete(publicId: string, userId: string) {
+    const file = await this.prisma.file.findUnique({
+      where: { publicId },
+    });
+
+    if (!file) throw new NotFoundException();
+    if (file.ownerId !== userId) throw new ForbiddenException('Not owner');
+
+    return this.prisma.file.update({
+      where: { id: file.id },
+      data: {
+        expiresAt: new Date(),
+      },
+      select: {
+        expiresAt: true,
+      },
+    });
   }
 }

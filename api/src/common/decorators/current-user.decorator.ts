@@ -1,9 +1,4 @@
-import {
-  createParamDecorator,
-  ExecutionContext,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { MESSAGES } from '../../constants';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 export type CurrentUserType = {
   sub: string;
@@ -17,11 +12,7 @@ export const CurrentUser = createParamDecorator(
     const request = ctx.switchToHttp().getRequest<Request>();
     const user = request['user'] as CurrentUserType;
 
-    if (user) {
-      if (data) return user[data];
-      return user;
-    }
-
-    throw new UnauthorizedException(MESSAGES.UNAUTHORIZED);
+    if (data) return user?.[data];
+    return user;
   },
 );

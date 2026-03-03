@@ -1,10 +1,26 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { fileTypeFromBuffer } from 'file-type';
-import { envConfig } from '../config';
 import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from '../constants';
+import { envConfig } from '../config';
 
 export const getUrl = (imgId: string): string => {
   return `${envConfig.APP_URL}/files/${imgId}`;
+};
+
+export const ensureAccessible = (file: any, userId?: string) => {
+  if (file.expiresAt < new Date()) {
+    throw new ForbiddenException('File expired');
+  }
+
+  if (file.maxDownloads && file.downloadCount >= file.maxDownloads) {
+    throw new ForbiddenException('Download limit reached');
+  }
+
+  if (file.visibility === 'PRIVATE') {
+    if (!userId || file.ownerId !== userId) {
+      throw new ForbiddenException('Access denied');
+    }
+  }
 };
 
 export const fileValidation = async (

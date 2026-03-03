@@ -31,7 +31,7 @@ export const UploadFileSchema = z
   .object({
     name: z.string().min(3).max(30).optional(),
     visibility: z.enum(['PRIVATE', 'PUBLIC']).default('PUBLIC'),
-    description: z.string().max(50).optional(),
+    maxDownloads: z.number().min(1).max(500).optional(),
     expiresAt: z
       .enum(expirationOptions)
       .transform((value) => expirationToDate(value))

@@ -1,7 +1,7 @@
 export type FindByIdResponse = {
   id: string;
-  name: string;
   email: string;
+  name: string | null;
   createdAt: Date;
   updatedAt: Date;
-};
+} | null;

@@ -14,39 +14,44 @@ enum FileVisibility {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  name         String
+  id           String   @id @default(uuid())
   email        String   @unique
   passwordHash String
-
-  files        File[]
+  name         String?
 
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  @@index([email])
+  files        File[]
+
+  @@index([createdAt])
 }
 
 model File {
-  id          String         @id @default(uuid())
-  hashKey     String         @unique
-  name        String
-  size        Int
-  mimeType    String
-  storageId   String
-  description String?
+  id            String         @id @default(uuid()) // internal DB id
+  publicId      String         @unique // nanoid(12-16), exposed in URL
 
-  visibility  FileVisibility @default(PUBLIC)
+  ownerId       String?
+  owner         User?          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
-  expiresAt   DateTime
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  originalName  String
+  storageKey    String         // S3/local storage reference
+  mimeType      String
+  size          Int
 
-  userId      String
-  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  visibility    FileVisibility @default(PRIVATE)
 
-  @@index([userId])
+  expiresAt     DateTime
+  downloadCount Int            @default(0)
+  maxDownloads  Int?
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  // Indexing strategy (very important)
+  @@index([ownerId])
+  @@index([visibility])
   @@index([expiresAt])
-  @@index([userId, visibility])
-  @@index([userId, expiresAt])
+  @@index([ownerId, visibility])
+  @@index([visibility, expiresAt])
 }

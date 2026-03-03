@@ -1,61 +1,33 @@
-import { Injectable } from '@nestjs/common';
-import { AppwriteException, Models } from 'node-appwrite';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { ID } from 'node-appwrite';
 import { InputFile } from 'node-appwrite/file';
-import { envConfig, storage } from '../config';
-import { randomString } from '../lib';
-
-@Injectable()
-export class Appwrite {
-  private storage = storage;
-
-  async upload(
-    inputImage: Express.Multer.File,
-    fileId: string = randomString(6),
-  ): Promise<Models.File> {
-    const file = InputFile.fromBuffer(
-      inputImage.buffer,
-      inputImage.originalname,
-    );
-    return await this.storage.createFile({
-      bucketId: envConfig.APPWRITE_BUCKET_ID,
-      file,
-      fileId,
-    });
-  }
-
-  async preview(imageId: string): Promise<ArrayBuffer> {
-    try {
-      return await this.storage.getFileView(
-        envConfig.APPWRITE_BUCKET_ID,
-        imageId,
-      );
-    } catch (error: unknown) {
-      if (error instanceof AppwriteException) {
-        return await this.storage.getFileView(
-          envConfig.APPWRITE_BUCKET_ID,
-          envConfig.APPWRITE_NOT_FOUND,
-        );
-      }
-      return await this.storage.getFileView(
-        envConfig.APPWRITE_BUCKET_ID,
-        envConfig.APPWRITE_NOT_FOUND,
-      );
-    }
-  }
-}
+import { storage, envConfig } from '../config';
 
 @Injectable()
 export class StorageService {
-  constructor(private readonly storage: Appwrite) {}
+  async uploadFile(file: Express.Multer.File): Promise<{ storageKey: string }> {
+    try {
+      const uploadedFile = await storage.createFile({
+        file: InputFile.fromBuffer(file.buffer, file.originalname),
+        bucketId: envConfig.APPWRITE_BUCKET_ID,
+        fileId: ID.unique(),
+      });
 
-  async upload(
-    file: Express.Multer.File,
-    fileId?: string,
-  ): Promise<Models.File> {
-    return await this.storage.upload(file, fileId);
+      return { storageKey: uploadedFile.$id };
+    } catch {
+      throw new InternalServerErrorException('Storage upload failed');
+    }
   }
 
-  async preview(imageId: string): Promise<ArrayBuffer> {
-    return await this.storage.preview(imageId);
+  async getPreview(storageKey: string): Promise<ArrayBuffer> {
+    return storage.getFilePreview(envConfig.APPWRITE_BUCKET_ID, storageKey);
+  }
+
+  async getDownload(storageKey: string): Promise<ArrayBuffer> {
+    return storage.getFileDownload(envConfig.APPWRITE_BUCKET_ID, storageKey);
+  }
+
+  async deleteFile(storageKey: string): Promise<void> {
+    await storage.deleteFile(envConfig.APPWRITE_BUCKET_ID, storageKey);
   }
 }
