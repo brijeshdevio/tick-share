@@ -5,11 +5,11 @@
   "main": "index.ts",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/index.ts",
-    "build": "tsc",
     "start": "node -r tsconfig-paths/register dist/index.js",
-    "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate deploy"
+    "prisma:migrate": "prisma migrate deploy",
+    "build": "tsup src/index.ts --format cjs",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "Brijesh",
