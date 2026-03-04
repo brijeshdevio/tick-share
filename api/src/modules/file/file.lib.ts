@@ -1,7 +1,7 @@
 import { fileTypeFromBuffer } from "file-type";
-import { BadRequestException, ForbiddenException } from "@/common/errors";
-import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from "@/constants";
-import { env } from "@/config";
+import { env } from "../../config";
+import { BadRequestException, ForbiddenException } from "../../common/errors";
+import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from "../../constants";
 
 export const getUrl = (publicId: string): string => {
   return `${env.APP_URL}/files/${publicId}/metadata`;

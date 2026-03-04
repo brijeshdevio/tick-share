@@ -1,8 +1,8 @@
-import { env } from "@/config";
-import { COOKIE_NAME } from "@/constants";
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { UnauthorizedException } from "../errors";
+import { COOKIE_NAME } from "../../constants";
+import { env } from "../../config";
 
 export function authMiddleware(
   req: Request,

@@ -1,5 +1,5 @@
-import { UnauthorizedException } from "@/common/errors";
-import { prisma } from "@/config";
+import { UnauthorizedException } from "../../common/errors";
+import { prisma } from "../../config";
 
 export class UserService {
   private readonly prisma: typeof prisma;

@@ -1,8 +1,8 @@
 import { nanoid } from "nanoid";
 import { UploadFileDto } from "./file.types";
-import { prisma } from "@/config";
+import { prisma } from "../../config";
 import { StorageService } from "../storage";
-import { ForbiddenException, NotFoundException } from "@/common/errors";
+import { ForbiddenException, NotFoundException } from "../../common/errors";
 import { ensureAccessible } from "./file.lib";
 
 export class FileService {

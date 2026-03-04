@@ -5,9 +5,9 @@ import {
   authMiddleware,
   optionalAuthMiddleware,
   zodValidationMiddleware,
-} from "@/common/middlewares";
+} from "../../common/middlewares";
 import { UploadFileSchema } from "./file.schema";
-import { upload } from "@/config";
+import { upload } from "../../config";
 
 export const fileRoutes = Router();
 const fileController = new FileController(new FileService());

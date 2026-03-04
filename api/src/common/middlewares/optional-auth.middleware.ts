@@ -1,7 +1,7 @@
-import { env } from "@/config";
-import { COOKIE_NAME } from "@/constants";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { COOKIE_NAME } from "../../constants";
+import { env } from "../../config";
 
 export function optionalAuthMiddleware(
   req: Request,

@@ -1,14 +1,14 @@
 import jwt from "jsonwebtoken";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
-import { prisma } from "@/config";
 import { LoginDto, RegisterDto } from "./auth.types";
-import { comparePassword, hashPassword } from "@/lib";
-import { DUMMY_HASH, PRISMA_ERROR_CODES } from "@/constants";
+import { prisma } from "../../config";
+import { comparePassword, hashPassword } from "../../lib";
+import { DUMMY_HASH, PRISMA_ERROR_CODES } from "../../constants";
 import {
   ConflictException,
   InternalServerErrorException,
   UnauthorizedException,
-} from "@/common/errors";
+} from "../../common/errors";
 
 export class AuthService {
   private readonly prisma: typeof prisma;

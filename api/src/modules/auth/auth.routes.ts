@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { authMiddleware, zodValidationMiddleware } from "@/common/middlewares";
+import {
+  authMiddleware,
+  zodValidationMiddleware,
+} from "../../common/middlewares";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { LoginSchema, RegisterSchema } from "./auth.schem";

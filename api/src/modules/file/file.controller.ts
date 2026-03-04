@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import { FileService } from "./file.service";
-import { apiResponse } from "@/lib/http";
 import { fileValidation, getUrl } from "./file.lib";
-import { ALLOWED_MIME_TYPES, MESSAGES } from "@/constants";
-import { BadRequestException, UnauthorizedException } from "@/common/errors";
-import { env } from "@/config";
+import { BadRequestException } from "../../common/errors";
+import { apiResponse } from "../../lib/http";
+import { ALLOWED_MIME_TYPES, MESSAGES } from "../../constants";
+import { env } from "../../config";
 
 export class FileController {
   constructor(private readonly fileService: FileService) {}

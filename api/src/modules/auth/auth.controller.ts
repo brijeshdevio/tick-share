@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { COOKIE_EXPIRES, COOKIE_NAME, MESSAGES } from "@/constants";
 import { AuthService } from "./auth.service";
-import { apiResponse, clearCookie, setCookie } from "@/lib/http";
+import { apiResponse, clearCookie, setCookie } from "../../lib/http";
+import { COOKIE_EXPIRES, COOKIE_NAME, MESSAGES } from "../../constants";
 
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

@@ -3,13 +3,12 @@
   "version": "1.0.0",
   "description": "Tick Share api",
   "main": "index.ts",
+  "type": "commonjs",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/index.ts",
-    "start": "node -r tsconfig-paths/register dist/index.js",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate deploy",
-    "build": "tsup src/index.ts --format cjs",
-    "postinstall": "prisma generate"
+    "build": "rm -rf dist && tsc",
+    "postinstall": "prisma generate",
+    "start": "node dist/index.js"
   },
   "keywords": [],
   "author": "Brijesh",
@@ -43,7 +42,6 @@
     "prisma": "^7.4.2",
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",
-    "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   }
 }
