@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { HttpException } from "./http-exception";
 import { ZodError, ZodIssue } from "zod";
-import { BadRequestException } from "./exceptions";
 
 const formatZodError = (issues: ZodIssue[]) => {
   return issues.map((issue) => {
@@ -34,7 +33,6 @@ export function globalErrorHandler(
   }
 
   if (err instanceof HttpException) {
-    console.log("HttpException", err);
     return res.status(err.statusCode).json({
       success: false,
       statusCode: err.statusCode,

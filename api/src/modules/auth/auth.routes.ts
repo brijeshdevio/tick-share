@@ -6,6 +6,7 @@ import {
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { LoginSchema, RegisterSchema } from "./auth.schem";
+import { asyncHandler } from "../../common/errors";
 
 export const authRoutes = Router();
 const authController = new AuthController(new AuthService());
@@ -13,11 +14,11 @@ const authController = new AuthController(new AuthService());
 authRoutes.post(
   "/register",
   zodValidationMiddleware(RegisterSchema, "body"),
-  authController.register,
+  asyncHandler(authController.register),
 );
 authRoutes.post(
   "/login",
   zodValidationMiddleware(LoginSchema, "body"),
-  authController.login,
+  asyncHandler(authController.login),
 );
 authRoutes.post("/logout", authMiddleware, authController.logout);

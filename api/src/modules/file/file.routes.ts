@@ -8,6 +8,7 @@ import {
 } from "../../common/middlewares";
 import { UploadFileSchema } from "./file.schema";
 import { upload } from "../../config";
+import { asyncHandler } from "../../common/errors";
 
 export const fileRoutes = Router();
 const fileController = new FileController(new FileService());
@@ -17,22 +18,22 @@ fileRoutes.post(
   authMiddleware,
   upload.single("file"),
   zodValidationMiddleware(UploadFileSchema, "body"),
-  fileController.upload,
+  asyncHandler(fileController.upload),
 );
 fileRoutes.get("/", authMiddleware, fileController.findMany);
 fileRoutes.get(
   "/:publicId/metadata",
   optionalAuthMiddleware,
-  fileController.findOne,
+  asyncHandler(fileController.findOne),
 );
 fileRoutes.get(
   "/:publicId/preview",
   optionalAuthMiddleware,
-  fileController.previewFile,
+  asyncHandler(fileController.previewFile),
 );
 fileRoutes.get(
   "/:publicId/download",
   optionalAuthMiddleware,
-  fileController.downloadFile,
+  asyncHandler(fileController.downloadFile),
 );
-fileRoutes.delete("/:id", authMiddleware, fileController.delete);
+fileRoutes.delete("/:id", authMiddleware, asyncHandler(fileController.delete));
