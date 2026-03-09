@@ -1,4 +1,3 @@
-import { createHash, randomBytes } from "node:crypto";
 import argon2 from "argon2";
 
 export async function hashPassword(password: string): Promise<string> {
@@ -10,12 +9,4 @@ export async function comparePassword(
   password: string,
 ): Promise<boolean> {
   return await argon2.verify(hashedPassword, password);
-}
-
-export function randomString(size: number = 64): string {
-  return randomBytes(size).toString("hex");
-}
-
-export function hashString(str: string): string {
-  return createHash("sha256").update(str).digest("hex");
 }

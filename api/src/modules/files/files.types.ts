@@ -1,5 +1,5 @@
 import z from "zod";
-import { UploadFileSchema } from "./file.schema";
+import { UploadFileSchema } from "./files.schema";
 
 // ================ DTOs =================
 

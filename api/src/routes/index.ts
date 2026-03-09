@@ -1,10 +1,7 @@
 import { Router } from "express";
-import { authMiddleware } from "../common/middlewares";
-import { authRoutes } from "../modules/auth";
-import { userRoutes } from "../modules/user";
-import { fileRoutes } from "../modules/file";
+import { authRouter } from "../modules/auth/auth.routes";
+import { filesRouter } from "../modules/files/files.routes";
 
 export const routes = Router();
-routes.use("/auth", authRoutes);
-routes.use("/users", authMiddleware, userRoutes);
-routes.use("/files", fileRoutes);
+routes.use("/auth", authRouter);
+routes.use("/files", filesRouter);

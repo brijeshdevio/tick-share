@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { HttpException } from "./http-exception";
+import { HttpException } from "./httpException";
 import { ZodError, ZodIssue } from "zod";
 
 const formatZodError = (issues: ZodIssue[]) => {

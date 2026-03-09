@@ -1,5 +1,5 @@
 import z from "zod";
-import { LoginSchema, RegisterSchema } from "./auth.schem";
+import { LoginSchema, RegisterSchema } from "./auth.schema";
 
 // ================ DTOs =================
 

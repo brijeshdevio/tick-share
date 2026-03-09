@@ -3,7 +3,7 @@ import { z } from "zod";
 export const RegisterSchema = z
   .object({
     name: z
-      .string("Name is required")
+      .string()
       .min(3, "Name must be at least 3 characters")
       .max(30, "Name must be at most 30 characters"),
     email: z.string("Email is required").email("Invalid email address"),

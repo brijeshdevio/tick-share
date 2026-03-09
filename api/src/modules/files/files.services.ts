@@ -1,11 +1,11 @@
 import { nanoid } from "nanoid";
-import { UploadFileDto } from "./file.types";
 import { prisma } from "../../config";
-import { StorageService } from "../storage";
-import { ForbiddenException, NotFoundException } from "../../common/errors";
-import { ensureAccessible } from "./file.lib";
+import { StorageService } from "../storage/storage.service";
+import { ForbiddenException, NotFoundException } from "../../common";
+import { ensureAccessible } from "./files.lib";
+import { UploadFileDto } from "./files.types";
 
-export class FileService {
+export class FilesService {
   private readonly prisma: typeof prisma;
   private readonly storage = new StorageService();
   constructor() {
@@ -18,30 +18,27 @@ export class FileService {
     data: UploadFileDto,
     file: Express.Multer.File,
   ) => {
-    const publicId = nanoid(14);
-    const { storageKey } = await this.storage.uploadFile(file);
-    if (!data.visibility) data.visibility = "PUBLIC";
+    const shareToken = nanoid(14);
+    const { storageId } = await this.storage.uploadFile(file);
     if (!data.expiresAt) data.expiresAt = new Date(Date.now() + 30 * 60 * 1000);
 
     return this.prisma.file.create({
       data: {
-        publicId,
+        shareToken,
         ownerId,
         originalName: data.name ?? file.originalname,
-        storageKey,
+        storageId,
         mimeType: file.mimetype,
-        size: file.size,
-        visibility: data.visibility,
+        sizeBytes: file.size,
         expiresAt: data.expiresAt,
         maxDownloads: data.maxDownloads,
       },
       select: {
-        publicId: true,
+        shareToken: true,
         originalName: true,
         mimeType: true,
-        size: true,
+        sizeBytes: true,
         maxDownloads: true,
-        visibility: true,
       },
     });
   };
@@ -59,12 +56,11 @@ export class FileService {
         id: true,
         originalName: true,
         mimeType: true,
-        size: true,
+        sizeBytes: true,
         maxDownloads: true,
-        visibility: true,
         expiresAt: true,
         createdAt: true,
-        publicId: true,
+        shareToken: true,
       },
     });
 
@@ -78,19 +74,18 @@ export class FileService {
     return { files, nextCursor };
   };
 
-  findOne = async (publicId: string, ownerId: string) => {
+  findOne = async (shareToken: string) => {
     const file = await this.prisma.file.findUnique({
-      where: { publicId },
+      where: { shareToken },
       select: {
         id: true,
         originalName: true,
         mimeType: true,
-        size: true,
+        sizeBytes: true,
         maxDownloads: true,
-        visibility: true,
         expiresAt: true,
         createdAt: true,
-        publicId: true,
+        shareToken: true,
         downloadCount: true,
         owner: {
           select: {
@@ -101,15 +96,15 @@ export class FileService {
       },
     });
     if (!file) throw new NotFoundException(`File not found.`);
-    ensureAccessible(file, ownerId);
+    ensureAccessible(file);
     return file;
   };
 
-  previewFile = async (publicId: string, ownerId: string) => {
+  previewFile = async (shareToken: string) => {
     const file = await this.prisma.file.findUnique({
-      where: { publicId },
+      where: { shareToken },
       select: {
-        storageKey: true,
+        storageId: true,
         mimeType: true,
         originalName: true,
         expiresAt: true,
@@ -119,8 +114,8 @@ export class FileService {
       },
     });
     if (!file) throw new NotFoundException(`File not found.`);
-    ensureAccessible(file, ownerId);
-    const data = this.storage.getPreview(file.storageKey);
+    ensureAccessible(file);
+    const data = this.storage.getPreview(file.storageId);
     return {
       data,
       mimeType: file.mimeType,
@@ -128,17 +123,16 @@ export class FileService {
     };
   };
 
-  downloadFile = async (publicId: string, ownerId: string) => {
+  downloadFile = async (shareToken: string) => {
     return this.prisma.$transaction(async (tx) => {
       const file = await tx.file.findUnique({
-        where: { publicId },
+        where: { shareToken },
         select: {
           id: true,
-          storageKey: true,
+          storageId: true,
           originalName: true,
           mimeType: true,
           maxDownloads: true,
-          visibility: true,
           expiresAt: true,
           owner: {
             select: {
@@ -151,7 +145,7 @@ export class FileService {
 
       if (!file) throw new NotFoundException("File not found.");
 
-      ensureAccessible(file, ownerId);
+      ensureAccessible(file);
 
       // Atomic update (prevents race condition)
       const updated = await tx.file.updateMany({
@@ -170,7 +164,7 @@ export class FileService {
         throw new ForbiddenException("Download limit reached");
       }
 
-      const data = this.storage.getDownload(file.storageKey);
+      const data = this.storage.getDownload(file.storageId);
       return {
         data,
         mimeType: file.mimeType,

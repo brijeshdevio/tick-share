@@ -1,15 +1,16 @@
 {
   "compilerOptions": {
-    "typeRoots": ["./node_modules/@types", "./src/types"],
-    "target": "ES2020",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "outDir": "dist",
-    "rootDir": "src",
-    "strict": true,
-    "esModuleInterop": true,
+    "target": "ES2022",
+    "module": "CommonJS" /* Compiles to code Node understands without 'type: module' */,
+    "moduleResolution": "Node" /* Allows: import { app } from "./app" (no extension) */,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "esModuleInterop": true /* Essential for 'import express from "express"' */,
+    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true
+    "strict": true,
+    "noEmit": false /* Ensures the dist folder is actually created */
   },
-  "include": ["src"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }

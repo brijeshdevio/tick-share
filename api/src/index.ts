@@ -1,17 +1,12 @@
-import { env } from "./config";
 import { app } from "./app";
+import { env } from "./config";
 
-const PORT = env.PORT;
-
-function bootstrap() {
+const isDevelopment = env;
+if (isDevelopment) {
+  const PORT = env.PORT ?? 3000;
   app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
   });
-}
-
-const isDev = env.NODE_ENV === "development";
-if (isDev) {
-  bootstrap();
 }
 
 export default app;

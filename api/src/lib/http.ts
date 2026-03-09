@@ -40,7 +40,6 @@ export function apiResponse<D, R>(
 ) {
   return res.status(statusCode).json({
     success,
-    statusCode,
     message,
     data,
     ...rest,

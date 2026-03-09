@@ -1,24 +1,23 @@
 import { Router } from "express";
-import {
-  authMiddleware,
-  zodValidationMiddleware,
-} from "../../common/middlewares";
+import { authMiddleware, zodValidation } from "../../middlewares";
+import { asyncHandler } from "../../common";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
-import { LoginSchema, RegisterSchema } from "./auth.schem";
-import { asyncHandler } from "../../common/errors";
+import { LoginSchema, RegisterSchema } from "./auth.schema";
 
-export const authRoutes = Router();
 const authController = new AuthController(new AuthService());
+export const authRouter = Router();
 
-authRoutes.post(
+authRouter.post(
   "/register",
-  zodValidationMiddleware(RegisterSchema, "body"),
+  zodValidation(RegisterSchema),
   asyncHandler(authController.register),
 );
-authRoutes.post(
+authRouter.post(
   "/login",
-  zodValidationMiddleware(LoginSchema, "body"),
+  zodValidation(LoginSchema),
   asyncHandler(authController.login),
 );
-authRoutes.post("/logout", authMiddleware, authController.logout);
+
+authRouter.get("/me", authMiddleware, asyncHandler(authController.getUser));
+authRouter.post("/logout", authMiddleware, authController.logout);

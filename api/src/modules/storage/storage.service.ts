@@ -1,9 +1,9 @@
 import { ID } from "node-appwrite";
-import { InternalServerErrorException } from "../../common/errors";
 import { env, storage } from "../../config";
+import { InternalServerErrorException } from "../../common";
 
 export class StorageService {
-  async uploadFile(file: Express.Multer.File): Promise<{ storageKey: string }> {
+  async uploadFile(file: Express.Multer.File): Promise<{ storageId: string }> {
     try {
       const uploadedFile = await storage.createFile({
         file: new File([new Uint8Array(file.buffer)], file.originalname, {
@@ -13,7 +13,7 @@ export class StorageService {
         fileId: ID.unique(),
       });
 
-      return { storageKey: uploadedFile.$id };
+      return { storageId: uploadedFile.$id };
     } catch (error) {
       throw new InternalServerErrorException("Storage upload failed");
     }
