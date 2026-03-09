@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { fileTypeFromBuffer } from "file-type";
 import { BadRequestException } from "../../common";
 import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from "../../constants";

@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { FilesService } from "./files.services";
 import { apiResponse } from "../../lib";
 import { ALLOWED_MIME_TYPES } from "../../constants";

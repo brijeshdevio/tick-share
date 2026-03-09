@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { apiResponse, clearCookie, setCookie } from "../../lib";
 import { COOKIE_NAME } from "../../constants";
 import { AuthService } from "./auth.service";

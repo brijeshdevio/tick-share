@@ -1,4 +1,4 @@
-import express from "express";
+import express, { type Request, type Response } from "express";
 import cookieParser from "cookie-parser";
 import { routes } from "./routes";
 import { globalErrorHandler } from "./common";
@@ -9,11 +9,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.get("/", (_, res) => {
+app.get("/", (_: Request, res: Response) => {
   res.send("Welcome to Blip API!");
 });
 
-app.get("/health", (_, res) => {
+app.get("/health", (_: Request, res: Response) => {
   res.send("OK");
 });
 

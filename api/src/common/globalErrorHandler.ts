@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { HttpException } from "./httpException";
-import { ZodError, ZodIssue } from "zod";
+import { ZodError, type ZodIssue } from "zod";
 
 const formatZodError = (issues: ZodIssue[]) => {
   return issues.map((issue) => {
