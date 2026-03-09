@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { BaseLayout } from "@/app/layouts/BaseLayout";
+import { Loader } from "@/shared/ui";
 
 const Home = lazy(() => import("@/features/home/Home"));
 const Register = lazy(() => import("@/features/auth/pages/Register"));
@@ -12,7 +13,7 @@ const FilePreview = lazy(() => import("@/features/preview/FilePreview"));
 export function AppRoutes() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<div>Loading</div>}>
+      <Suspense fallback={<Loader className="h-screen" />}>
         <Routes>
           <Route element={<BaseLayout />}>
             <Route path="/" element={<Home />} />
