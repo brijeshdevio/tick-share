@@ -3,7 +3,7 @@ import cookieParser from "cookie-parser";
 import { routes } from "./routes";
 import { globalErrorHandler } from "./common";
 
-export const app = express();
+const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -20,3 +20,5 @@ app.get("/health", (_: Request, res: Response) => {
 app.use("/api", routes);
 
 app.use(globalErrorHandler);
+
+export default app;

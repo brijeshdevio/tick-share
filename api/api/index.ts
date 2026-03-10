@@ -1,5 +1,5 @@
-import { app } from "./app";
-import { env } from "./config";
+import app from "../src/app";
+import { env } from "../src/config";
 
 const isDevelopment = env.NODE_ENV === "development";
 if (isDevelopment) {
